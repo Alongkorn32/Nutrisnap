@@ -258,8 +258,20 @@
   <div id="inviteResult" class="result"></div>
 </div>
 
+<div
+  class="card"
+  id="patientListCard"
+  style="display:none"
+>
+  <h3>คนไข้ของฉัน</h3>
+
+  <div id="patientList">
+    กำลังโหลด...
+  </div>
+</div>
+
 <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
-  <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
+
   <div class="card" id="profileSetup">
 
     <h3>ตั้งค่าเป้าหมายของคุณ</h3>
@@ -1798,17 +1810,20 @@ async function loadUserRole() {
       admin หรือ clinician
       เท่านั้นที่เห็นเมนูเชิญคนไข้
     */
-    if (data.is_clinician) {
+  if (data.is_clinician) {
 
-      inviteCard.style.display =
-        "block";
+  inviteCard.style.display = "block";
 
-    } else {
+  await loadPatients();
 
-      inviteCard.style.display =
-        "none";
-    }
+} else {
 
+  inviteCard.style.display = "none";
+
+  document.getElementById(
+    "patientListCard"
+  ).style.display = "none";
+}
   } catch (error) {
 
     console.error(
@@ -1824,6 +1839,152 @@ async function loadUserRole() {
       "inviteCard"
     ).style.display = "none";
   }
+}
+  const GET_PATIENTS_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-patients";
+
+async function loadPatients() {
+
+  const card =
+    document.getElementById(
+      "patientListCard"
+    );
+
+  const container =
+    document.getElementById(
+      "patientList"
+    );
+
+  try {
+
+    if (
+      currentRole !== "admin" &&
+      currentRole !== "clinician"
+    ) {
+      card.style.display = "none";
+      return;
+    }
+
+    card.style.display = "block";
+
+    container.textContent =
+      "กำลังโหลดรายชื่อคนไข้...";
+
+    const token =
+      liff.getAccessToken();
+
+    const response =
+      await fetch(
+        GET_PATIENTS_URL,
+        {
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "โหลดรายชื่อคนไข้ไม่สำเร็จ"
+      );
+    }
+
+    renderPatients(
+      data.patients || []
+    );
+
+  } catch (error) {
+
+    container.textContent =
+      "❌ " + error.message;
+  }
+}
+
+
+function renderPatients(patients) {
+
+  const container =
+    document.getElementById(
+      "patientList"
+    );
+
+  container.innerHTML = "";
+
+  if (!patients.length) {
+
+    container.innerHTML =
+      `
+      <div class="empty">
+        ยังไม่มีคนไข้ที่เชื่อมกับคุณ
+      </div>
+      `;
+
+    return;
+  }
+
+  patients.forEach(
+    patient => {
+
+      const profile =
+        patient.profile;
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className = "meal";
+
+      let summary =
+        "ยังไม่ได้ตั้งค่าโปรไฟล์";
+
+      if (profile) {
+
+        summary =
+          `
+          ${profile.weight_kg || "-"} kg
+          · TDEE ${profile.tdee || "-"} kcal
+          · เป้า ${profile.calorie_target || "-"} kcal
+          `;
+      }
+
+      div.innerHTML =
+        `
+        <div class="meal-top">
+
+          <div>
+            <div class="meal-name">
+              คนไข้
+            </div>
+
+            <div class="meal-detail">
+              ${summary}
+            </div>
+          </div>
+
+          <div class="meal-kcal">
+            active
+          </div>
+
+        </div>
+
+        <div class="meal-detail">
+          LINE ID:
+          ${patient.line_user_id}
+        </div>
+        `;
+
+      container.appendChild(div);
+    }
+  );
 }
 startLIFF();
 
