@@ -600,6 +600,18 @@
       type="text"
       placeholder="ชื่ออาหาร เช่น ข้าวมันไก่"
     >
+    <button
+  type="button"
+  class="secondary"
+  onclick="searchFoodByName()"
+>
+  🔎 ค้นหาแคลอรี่และสารอาหาร
+</button>
+
+<div
+  id="foodSearchResult"
+  class="result"
+></div>
 
     <select id="mealType">
       <option value="breakfast">มื้อเช้า</option>
@@ -3149,6 +3161,122 @@ function showPatientsView() {
     currentRole === "clinician"
   ) {
     loadPatients();
+  }
+}
+  const SEARCH_FOOD_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/search-food";
+
+async function searchFoodByName() {
+
+  const foodName =
+    document.getElementById("foodName")
+      .value
+      .trim();
+
+  const result =
+    document.getElementById(
+      "foodSearchResult"
+    );
+
+  if (!foodName) {
+    result.textContent =
+      "กรุณาพิมพ์ชื่ออาหารก่อน";
+    return;
+  }
+
+  try {
+
+    result.textContent =
+      "กำลังค้นหาข้อมูลอาหาร...";
+
+    const response =
+      await fetch(
+        SEARCH_FOOD_URL +
+        "?q=" +
+        encodeURIComponent(foodName)
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "ค้นหาข้อมูลไม่สำเร็จ"
+      );
+    }
+
+    const foods =
+      data.foods || [];
+
+    if (!foods.length) {
+      result.textContent =
+        "ไม่พบเมนูนี้ในฐานข้อมูล";
+      return;
+    }
+
+    const food =
+      foods[0];
+
+    document.getElementById(
+      "foodName"
+    ).value =
+      food.food_name || foodName;
+
+    document.getElementById(
+      "calories"
+    ).value =
+      food.calories ?? "";
+
+    document.getElementById(
+      "protein"
+    ).value =
+      food.protein ?? "";
+
+    document.getElementById(
+      "carbs"
+    ).value =
+      food.carbs ?? "";
+
+    document.getElementById(
+      "fat"
+    ).value =
+      food.fat ?? "";
+
+    document.getElementById(
+      "sugar"
+    ).value =
+      food.sugar ?? "";
+
+    document.getElementById(
+      "fiber"
+    ).value =
+      food.fiber ?? "";
+
+    document.getElementById(
+      "sodium"
+    ).value =
+      food.sodium ?? "";
+
+    result.textContent =
+      "✅ พบ " +
+      food.food_name +
+      (
+        food.serving_description
+          ? " · " +
+            food.serving_description
+          : ""
+      );
+
+  } catch (error) {
+
+    console.error(error);
+
+    result.textContent =
+      "❌ " + error.message;
   }
 }
 startLIFF();
