@@ -293,7 +293,22 @@
 
   <div id="patientDetailSummary"></div>
 
-  <div id="patientDetailMeals"></div>
+<div id="patientDetailMeals"></div>
+
+<div
+  class="card"
+  id="patientTrendCard"
+  style="display:none"
+>
+  <h3>แนวโน้ม 7 วัน</h3>
+
+  <div id="patientTrendSummary"></div>
+
+  <div
+    id="patientTrendBars"
+    style="margin-top:16px;"
+  ></div>
+</div>
 </div>
 <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
 
@@ -2091,6 +2106,7 @@ async function openPatientDetail(
   });
 
   await loadPatientDetail();
+  await loadPatientTrends(patientId);
 }
 
 
@@ -2439,6 +2455,177 @@ function closePatientDetail() {
   ).scrollIntoView({
     behavior: "smooth"
   });
+}
+  const GET_PATIENT_TRENDS_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-patient-trends";
+
+async function loadPatientTrends(patientId) {
+
+  const card =
+    document.getElementById(
+      "patientTrendCard"
+    );
+
+  const summary =
+    document.getElementById(
+      "patientTrendSummary"
+    );
+
+  const bars =
+    document.getElementById(
+      "patientTrendBars"
+    );
+
+  try {
+
+    const token =
+      liff.getAccessToken();
+
+    if (!token) {
+      throw new Error(
+        "ไม่พบ LINE access token"
+      );
+    }
+
+    const response =
+      await fetch(
+        GET_PATIENT_TRENDS_URL +
+        "?patient_id=" +
+        encodeURIComponent(patientId),
+        {
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "โหลดแนวโน้มไม่สำเร็จ"
+      );
+    }
+
+    card.style.display =
+      "block";
+
+    summary.innerHTML =
+      `
+      บันทึกอาหาร
+      <b>${data.summary.tracked_days}</b>
+      จาก 7 วัน
+      <br>
+      แคลอรี่เฉลี่ยวันที่มีการบันทึก:
+      <b>${data.summary.average_calories} kcal</b>
+      `;
+
+    bars.innerHTML = "";
+
+    const target =
+      Number(
+        data.targets?.calories || 0
+      );
+
+    data.days.forEach(
+      day => {
+
+        const calories =
+          Number(
+            day.calories || 0
+          );
+
+        const percent =
+          target > 0
+            ? Math.min(
+                calories / target * 100,
+                100
+              )
+            : 0;
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+        row.style.marginBottom =
+          "14px";
+
+        row.innerHTML =
+          `
+          <div
+            style="
+              display:flex;
+              justify-content:space-between;
+              gap:10px;
+              font-size:14px;
+              margin-bottom:5px;
+            "
+          >
+            <span>
+              ${formatTrendDate(day.date)}
+            </span>
+
+            <span>
+              ${round(calories)} kcal
+            </span>
+          </div>
+
+          <div
+            style="
+              height:10px;
+              background:#e8f3ec;
+              border-radius:999px;
+              overflow:hidden;
+            "
+          >
+            <div
+              style="
+                height:100%;
+                width:${percent}%;
+                background:#20b26b;
+              "
+            ></div>
+          </div>
+          `;
+
+        bars.appendChild(row);
+      }
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    card.style.display =
+      "block";
+
+    summary.textContent =
+      "โหลดแนวโน้มไม่ได้: " +
+      error.message;
+  }
+}
+
+function formatTrendDate(value) {
+
+  const date =
+    new Date(
+      value + "T00:00:00+07:00"
+    );
+
+  return date.toLocaleDateString(
+    "th-TH",
+    {
+      day: "numeric",
+      month: "short"
+    }
+  );
 }
 startLIFF();
 
