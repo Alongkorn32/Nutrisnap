@@ -269,7 +269,32 @@
     กำลังโหลด...
   </div>
 </div>
+<div
+  class="card"
+  id="patientDetailCard"
+  style="display:none"
+>
+  <button
+    class="secondary"
+    onclick="closePatientDetail()"
+  >
+    ← กลับไปรายชื่อคนไข้
+  </button>
 
+  <div id="patientDetailHeader"></div>
+
+  <h3>ข้อมูลประจำวันที่เลือก</h3>
+
+  <input
+    type="date"
+    id="patientDetailDate"
+    onchange="reloadSelectedPatient()"
+  >
+
+  <div id="patientDetailSummary"></div>
+
+  <div id="patientDetailMeals"></div>
+</div>
 <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
 
   <div class="card" id="profileSetup">
@@ -2003,9 +2028,374 @@ div.innerHTML =
 
   </div>
   `;
+      div.style.cursor =
+  "pointer";
+
+div.addEventListener(
+  "click",
+  () => {
+    openPatientDetail(
+      patient.line_user_id
+    );
+  }
+);
       container.appendChild(div);
     }
   );
+}
+  const GET_PATIENT_DETAIL_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-patient-detail";
+
+let selectedPatientId = null;
+
+
+function todayBangkok() {
+
+  return new Date(
+    Date.now() +
+    7 * 60 * 60 * 1000
+  )
+    .toISOString()
+    .slice(0, 10);
+}
+
+
+async function openPatientDetail(
+  patientId
+) {
+
+  selectedPatientId =
+    patientId;
+
+  const card =
+    document.getElementById(
+      "patientDetailCard"
+    );
+
+  const dateInput =
+    document.getElementById(
+      "patientDetailDate"
+    );
+
+  if (!dateInput.value) {
+    dateInput.value =
+      todayBangkok();
+  }
+
+  card.style.display =
+    "block";
+
+  card.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+  await loadPatientDetail();
+}
+
+
+async function reloadSelectedPatient() {
+
+  if (!selectedPatientId) {
+    return;
+  }
+
+  await loadPatientDetail();
+}
+
+
+async function loadPatientDetail() {
+
+  const header =
+    document.getElementById(
+      "patientDetailHeader"
+    );
+
+  const summary =
+    document.getElementById(
+      "patientDetailSummary"
+    );
+
+  const mealsContainer =
+    document.getElementById(
+      "patientDetailMeals"
+    );
+
+  try {
+
+    header.innerHTML =
+      "<h3>กำลังโหลดข้อมูลคนไข้...</h3>";
+
+    summary.innerHTML = "";
+    mealsContainer.innerHTML = "";
+
+    const token =
+      liff.getAccessToken();
+
+    const date =
+      document.getElementById(
+        "patientDetailDate"
+      ).value;
+
+    const url =
+      GET_PATIENT_DETAIL_URL +
+      "?patient=" +
+      encodeURIComponent(
+        selectedPatientId
+      ) +
+      "&date=" +
+      encodeURIComponent(date);
+
+    const response =
+      await fetch(
+        url,
+        {
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "โหลดข้อมูลคนไข้ไม่สำเร็จ"
+      );
+    }
+
+    renderPatientDetail(data);
+
+  } catch (error) {
+
+    header.innerHTML =
+      "<h3>โหลดข้อมูลไม่สำเร็จ</h3>";
+
+    summary.textContent =
+      "❌ " + error.message;
+  }
+}
+
+
+function renderPatientDetail(data) {
+
+  const profile =
+    data.profile;
+
+  const totals =
+    data.totals || {};
+
+  const meals =
+    data.meals || [];
+
+  const header =
+    document.getElementById(
+      "patientDetailHeader"
+    );
+
+  const summary =
+    document.getElementById(
+      "patientDetailSummary"
+    );
+
+  const mealsContainer =
+    document.getElementById(
+      "patientDetailMeals"
+    );
+
+
+  const displayName =
+    profile?.display_name ||
+    "คนไข้";
+
+  const pictureUrl =
+    profile?.picture_url ||
+    "";
+
+
+  header.innerHTML =
+    `
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        gap:14px;
+        margin-top:18px;
+      "
+    >
+
+      ${
+        pictureUrl
+          ? `
+            <img
+              src="${pictureUrl}"
+              style="
+                width:64px;
+                height:64px;
+                border-radius:50%;
+                object-fit:cover;
+              "
+            >
+          `
+          : ""
+      }
+
+      <div>
+        <h2 style="margin:0;">
+          ${escapeHtml(displayName)}
+        </h2>
+
+        ${
+          profile
+            ? `
+              <div class="status">
+                ${profile.weight_kg || "-"} kg
+                · TDEE ${profile.tdee || "-"} kcal
+                · เป้า ${profile.calorie_target || "-"} kcal
+              </div>
+            `
+            : `
+              <div class="status">
+                ยังไม่ได้ตั้งค่าโปรไฟล์
+              </div>
+            `
+        }
+      </div>
+
+    </div>
+    `;
+
+
+  summary.innerHTML =
+    `
+    <div
+      style="
+        margin-top:16px;
+        line-height:1.8;
+      "
+    >
+      <b>
+        ${round(totals.calories)} kcal
+      </b>
+      ในวันที่เลือก
+
+      <br>
+
+      โปรตีน
+      <b>${round(totals.protein)}g</b>
+      · คาร์บ
+      <b>${round(totals.carbs)}g</b>
+      · ไขมัน
+      <b>${round(totals.fat)}g</b>
+
+      <br>
+
+      น้ำตาล
+      <b>${round(totals.sugar)}g</b>
+      · ใยอาหาร
+      <b>${round(totals.fiber)}g</b>
+      · โซเดียม
+      <b>${round(totals.sodium)}mg</b>
+    </div>
+    `;
+
+
+  mealsContainer.innerHTML =
+    "<h3>อาหารในวันนี้</h3>";
+
+
+  if (!meals.length) {
+
+    mealsContainer.innerHTML +=
+      `
+      <div class="empty">
+        ไม่มีรายการอาหารในวันที่เลือก
+      </div>
+      `;
+
+    return;
+  }
+
+
+  meals.forEach(
+    meal => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "meal";
+
+      div.innerHTML =
+        `
+        <div class="meal-top">
+
+          <div>
+
+            <div class="meal-name">
+              ${escapeHtml(
+                meal.food_name ||
+                "ไม่ระบุชื่อ"
+              )}
+            </div>
+
+            <div class="meal-detail">
+              ${mealTypeThai(
+                meal.meal_type
+              )}
+            </div>
+
+          </div>
+
+          <div class="meal-kcal">
+            ${round(
+              meal.calories
+            )} kcal
+          </div>
+
+        </div>
+
+        <div class="meal-detail">
+          โปรตีน
+          ${round(meal.protein)}g
+          · คาร์บ
+          ${round(meal.carbs)}g
+          · ไขมัน
+          ${round(meal.fat)}g
+        </div>
+        `;
+
+      mealsContainer.appendChild(
+        div
+      );
+    }
+  );
+}
+
+
+function closePatientDetail() {
+
+  selectedPatientId =
+    null;
+
+  document.getElementById(
+    "patientDetailCard"
+  ).style.display =
+    "none";
+
+  document.getElementById(
+    "patientListCard"
+  ).scrollIntoView({
+    behavior: "smooth"
+  });
 }
 startLIFF();
 
