@@ -2084,9 +2084,23 @@ if (profile) {
 
 div.innerHTML =
   `
-  <div class="meal-top">
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    "
+  >
 
-    <div style="display:flex; gap:12px; align-items:center;">
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        gap:12px;
+        flex:1;
+      "
+    >
 
       ${
         pictureUrl
@@ -2095,8 +2109,8 @@ div.innerHTML =
               src="${pictureUrl}"
               alt="รูปโปรไฟล์"
               style="
-                width:48px;
-                height:48px;
+                width:52px;
+                height:52px;
                 border-radius:50%;
                 object-fit:cover;
                 flex-shrink:0;
@@ -2107,20 +2121,44 @@ div.innerHTML =
       }
 
       <div>
-        <div class="meal-name">
+
+        <div
+          class="meal-name"
+          style="font-size:17px;"
+        >
           ${escapeHtml(displayName)}
         </div>
 
         <div class="meal-detail">
-          ${summary}
+          ${
+            profile
+              ? `
+                น้ำหนัก ${profile.weight_kg || "-"} กก.
+                <br>
+                TDEE ${profile.tdee || "-"} kcal
+                <br>
+                เป้าพลังงาน ${profile.calorie_target || "-"} kcal
+              `
+              : "ยังไม่ได้ตั้งค่าโปรไฟล์"
+          }
         </div>
+
       </div>
 
     </div>
 
-    <div class="meal-kcal">
-      active
-    </div>
+    <button
+      class="secondary"
+      style="
+        width:auto;
+        padding:10px 14px;
+        margin:0;
+        white-space:nowrap;
+      "
+      onclick="openPatientDetail('${patient.line_user_id}')"
+    >
+      ดูรายละเอียด
+    </button>
 
   </div>
   `;
