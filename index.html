@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriSnap</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      background: #f5fff8;
+      color: #173d2b;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    .header {
+      margin-top: 20px;
+    }
+
+    h1 {
+      margin-bottom: 4px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 22px;
+      padding: 20px;
+      margin-top: 18px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    }
+
+    .calories {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    .macros {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+
+    .macro {
+      text-align: center;
+      flex: 1;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      padding: 16px;
+      margin-top: 18px;
+      border-radius: 16px;
+      background: #20b26b;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .meal {
+      padding: 14px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>NutriSnap 🥗</h1>
+      <div>สวัสดีครับ วันนี้กินอะไรไปแล้วบ้าง?</div>
+    </div>
+
+    <div class="card">
+      <div>พลังงานวันนี้</div>
+      <div class="calories">1,420 kcal</div>
+      <div>เป้าหมาย 2,000 kcal</div>
+
+      <div class="macros">
+        <div class="macro">
+          <b>72g</b><br>
+          โปรตีน
+        </div>
+
+        <div class="macro">
+          <b>155g</b><br>
+          คาร์บ
+        </div>
+
+        <div class="macro">
+          <b>48g</b><br>
+          ไขมัน
+        </div>
+      </div>
+    </div>
+
+    <button onclick="alert('เดี๋ยวเราจะต่อระบบถ่ายรูปในขั้นถัดไป')">
+      📷 ถ่ายรูปอาหาร
+    </button>
+
+    <div class="card">
+      <h3>อาหารวันนี้</h3>
+
+      <div class="meal">
+        🍳 มื้อเช้า<br>
+        ไข่ + ข้าว — 420 kcal
+      </div>
+
+      <div class="meal">
+        🍛 มื้อกลางวัน<br>
+        กะเพราไก่ — 620 kcal
+      </div>
+    </div>
+  </div>
+</body>
+</html>
