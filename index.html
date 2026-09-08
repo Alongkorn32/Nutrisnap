@@ -219,7 +219,37 @@
 </button>
 
 <div id="registerAdminResult"></div>
+<div id="registerAdminResult"></div>
 
+<div class="card" id="inviteCard">
+  <h3>เชิญคนไข้</h3>
+
+  <p class="status">
+    สร้างลิงก์ส่วนตัวของคุณ แล้วส่งให้คนไข้กดจาก LINE
+  </p>
+
+  <button onclick="createInviteLink()">
+    🔗 สร้างลิงก์เชิญคนไข้
+  </button>
+
+  <input
+    id="inviteUrl"
+    type="text"
+    readonly
+    placeholder="ลิงก์เชิญจะแสดงตรงนี้"
+  >
+
+  <button
+    class="secondary"
+    onclick="copyInviteLink()"
+  >
+    คัดลอกลิงก์
+  </button>
+
+  <div id="inviteResult" class="result"></div>
+</div>
+
+<!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
   <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
   <div class="card" id="profileSetup">
 
@@ -1514,6 +1544,105 @@ async function registerClinician() {
     button.disabled = false;
     button.textContent =
       "ลงทะเบียนฉันเป็น Admin คนแรก";
+  }
+}
+  const CREATE_INVITE_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/create-invite";
+
+async function createInviteLink() {
+
+  const result =
+    document.getElementById("inviteResult");
+
+  const input =
+    document.getElementById("inviteUrl");
+
+  try {
+
+    result.textContent =
+      "กำลังสร้างลิงก์...";
+
+    const token =
+      liff.getAccessToken();
+
+    if (!token) {
+      throw new Error(
+        "ไม่พบ LINE access token"
+      );
+    }
+
+    const response =
+      await fetch(
+        CREATE_INVITE_URL,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "สร้างลิงก์ไม่สำเร็จ"
+      );
+    }
+
+    input.value =
+      data.invite_url;
+
+    result.textContent =
+      "✅ สร้างลิงก์เชิญเรียบร้อยแล้ว";
+
+  } catch (error) {
+
+    result.textContent =
+      "❌ " + error.message;
+  }
+}
+
+async function copyInviteLink() {
+
+  const input =
+    document.getElementById("inviteUrl");
+
+  const result =
+    document.getElementById("inviteResult");
+
+  if (!input.value) {
+
+    result.textContent =
+      "กรุณาสร้างลิงก์ก่อน";
+
+    return;
+  }
+
+  try {
+
+    await navigator.clipboard.writeText(
+      input.value
+    );
+
+    result.textContent =
+      "✅ คัดลอกลิงก์แล้ว";
+
+  } catch (error) {
+
+    input.select();
+
+    document.execCommand("copy");
+
+    result.textContent =
+      "✅ คัดลอกลิงก์แล้ว";
   }
 }
 startLIFF();
