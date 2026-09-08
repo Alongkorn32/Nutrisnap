@@ -1943,45 +1943,66 @@ function renderPatients(patients) {
 
       div.className = "meal";
 
-      let summary =
-        "ยังไม่ได้ตั้งค่าโปรไฟล์";
+const displayName =
+  profile?.display_name || "คนไข้";
 
-      if (profile) {
+const pictureUrl =
+  profile?.picture_url || "";
 
-        summary =
+let summary =
+  "ยังไม่ได้ตั้งค่าโปรไฟล์";
+
+if (profile) {
+  summary =
+    `
+    ${profile.weight_kg || "-"} kg
+    · TDEE ${profile.tdee || "-"} kcal
+    · เป้า ${profile.calorie_target || "-"} kcal
+    `;
+}
+
+div.innerHTML =
+  `
+  <div class="meal-top">
+
+    <div style="display:flex; gap:12px; align-items:center;">
+
+      ${
+        pictureUrl
+          ? `
+            <img
+              src="${pictureUrl}"
+              alt="รูปโปรไฟล์"
+              style="
+                width:48px;
+                height:48px;
+                border-radius:50%;
+                object-fit:cover;
+                flex-shrink:0;
+              "
+            >
           `
-          ${profile.weight_kg || "-"} kg
-          · TDEE ${profile.tdee || "-"} kcal
-          · เป้า ${profile.calorie_target || "-"} kcal
-          `;
+          : ""
       }
 
-      div.innerHTML =
-        `
-        <div class="meal-top">
-
-          <div>
-            <div class="meal-name">
-              คนไข้
-            </div>
-
-            <div class="meal-detail">
-              ${summary}
-            </div>
-          </div>
-
-          <div class="meal-kcal">
-            active
-          </div>
-
+      <div>
+        <div class="meal-name">
+          ${escapeHtml(displayName)}
         </div>
 
         <div class="meal-detail">
-          LINE ID:
-          ${patient.line_user_id}
+          ${summary}
         </div>
-        `;
+      </div>
 
+    </div>
+
+    <div class="meal-kcal">
+      active
+    </div>
+
+  </div>
+  `;
       container.appendChild(div);
     }
   );
