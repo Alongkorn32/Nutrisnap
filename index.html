@@ -219,7 +219,8 @@
 </button>
 
 <div id="registerAdminResult"></div>
-<div id="registerAdminResult"></div>
+
+<div id="inviteAcceptResult" class="result"></div>
 
 <div class="card" id="inviteCard">
   <h3>เชิญคนไข้</h3>
@@ -527,15 +528,17 @@ async function startLIFF() {
       return;
     }
 
-    const profile =
-      await liff.getProfile();
+const profile =
+  await liff.getProfile();
 
-    document.getElementById(
-      "welcome"
-    ).textContent =
-      "สวัสดี " +
-      profile.displayName +
-      " 👋";
+await acceptInviteFromUrl();
+
+document.getElementById(
+  "welcome"
+).textContent =
+  "สวัสดี " +
+  profile.displayName +
+  " 👋";
 
     document.getElementById(
       "status"
@@ -1643,6 +1646,82 @@ async function copyInviteLink() {
 
     result.textContent =
       "✅ คัดลอกลิงก์แล้ว";
+  }
+}
+  const ACCEPT_INVITE_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/accept-invite";
+
+async function acceptInviteFromUrl() {
+  const params =
+    new URLSearchParams(window.location.search);
+
+  const inviteToken =
+    params.get("invite");
+
+  if (!inviteToken) {
+    return;
+  }
+
+  const result =
+    document.getElementById("inviteAcceptResult");
+
+  try {
+    result.textContent =
+      "กำลังเชื่อมต่อกับผู้ดูแล...";
+
+    const token =
+      liff.getAccessToken();
+
+    if (!token) {
+      throw new Error(
+        "ไม่พบ LINE access token"
+      );
+    }
+
+    const response =
+      await fetch(
+        ACCEPT_INVITE_URL,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+            Authorization:
+              "Bearer " + token
+          },
+          body:
+            JSON.stringify({
+              invite_token:
+                inviteToken
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "เชื่อมต่อกับผู้ดูแลไม่สำเร็จ"
+      );
+    }
+
+    result.textContent =
+      "✅ เชื่อมต่อกับผู้ดูแล " +
+      (
+        data.clinician
+          ?.display_name ||
+        ""
+      ) +
+      " เรียบร้อยแล้ว";
+
+  } catch (error) {
+    result.textContent =
+      "❌ " + error.message;
   }
 }
 startLIFF();
