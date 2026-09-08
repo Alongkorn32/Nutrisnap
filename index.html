@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>NutriSnap</title>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -19,6 +20,11 @@
       max-width: 480px;
       margin: auto;
       padding: 24px;
+      padding-bottom: 80px;
+    }
+
+    h1 {
+      margin-bottom: 4px;
     }
 
     .profile {
@@ -36,8 +42,10 @@
       display: none;
     }
 
-    h1 {
-      margin-bottom: 4px;
+    .status {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 4px;
     }
 
     .card {
@@ -49,7 +57,7 @@
     }
 
     .calories {
-      font-size: 36px;
+      font-size: 38px;
       font-weight: bold;
       margin: 8px 0;
     }
@@ -57,12 +65,16 @@
     .macros {
       display: flex;
       justify-content: space-between;
-      margin-top: 16px;
+      margin-top: 20px;
     }
 
     .macro {
       text-align: center;
       flex: 1;
+    }
+
+    .macro b {
+      font-size: 20px;
     }
 
     button {
@@ -81,7 +93,8 @@
       opacity: 0.6;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
       box-sizing: border-box;
       padding: 14px;
@@ -114,15 +127,49 @@
       object-fit: cover;
     }
 
-    .status {
+    .result {
+      margin-top: 14px;
+      font-weight: bold;
+    }
+
+    .meal {
+      padding: 14px 0;
+      border-bottom: 1px solid #edf2ef;
+    }
+
+    .meal:last-child {
+      border-bottom: none;
+    }
+
+    .meal-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .meal-name {
+      font-weight: bold;
+    }
+
+    .meal-kcal {
+      white-space: nowrap;
+      font-weight: bold;
+    }
+
+    .meal-detail {
       font-size: 14px;
       opacity: 0.7;
       margin-top: 5px;
     }
 
-    .result {
-      margin-top: 14px;
-      font-weight: bold;
+    .empty {
+      text-align: center;
+      padding: 20px 0;
+      opacity: 0.65;
+    }
+
+    .loading {
+      opacity: 0.6;
     }
   </style>
 </head>
@@ -134,43 +181,65 @@
   <h1>NutriSnap 🥗</h1>
 
   <div class="profile">
+
     <img id="profileImage" alt="LINE profile">
 
     <div>
-      <div id="welcome">กำลังเชื่อมต่อ LINE...</div>
-      <div class="status" id="status"></div>
+      <div id="welcome">
+        กำลังเชื่อมต่อ LINE...
+      </div>
+
+      <div
+        class="status"
+        id="status"
+      ></div>
     </div>
+
   </div>
 
+
+  <!-- Dashboard -->
   <div class="card">
+
     <div>พลังงานวันนี้</div>
 
-    <div class="calories">
-      1,420 kcal
+    <div
+      class="calories"
+      id="totalCalories"
+    >
+      0 kcal
     </div>
 
-    <div>เป้าหมาย 2,000 kcal</div>
+    <div class="status">
+      เป้าหมายรายวัน: ยังไม่ได้ตั้ง
+    </div>
 
     <div class="macros">
 
       <div class="macro">
-        <b>72g</b><br>
+        <b id="totalProtein">0g</b>
+        <br>
         โปรตีน
       </div>
 
       <div class="macro">
-        <b>155g</b><br>
+        <b id="totalCarbs">0g</b>
+        <br>
         คาร์บ
       </div>
 
       <div class="macro">
-        <b>48g</b><br>
+        <b id="totalFat">0g</b>
+        <br>
         ไขมัน
       </div>
 
     </div>
+
   </div>
 
+
+  <!-- Camera -->
   <input
     type="file"
     id="foodInput"
@@ -182,11 +251,21 @@
     📷 ถ่ายรูปอาหาร
   </button>
 
-  <div class="card" id="previewCard">
+
+  <div
+    class="card"
+    id="previewCard"
+  >
     <h3>รูปอาหาร</h3>
-    <img id="foodPreview" alt="รูปอาหาร">
+
+    <img
+      id="foodPreview"
+      alt="รูปอาหาร"
+    >
   </div>
 
+
+  <!-- Add meal -->
   <div class="card">
 
     <h3>บันทึกอาหาร</h3>
@@ -198,10 +277,21 @@
     >
 
     <select id="mealType">
-      <option value="breakfast">มื้อเช้า</option>
-      <option value="lunch">มื้อกลางวัน</option>
-      <option value="dinner">มื้อเย็น</option>
-      <option value="snack">ของว่าง</option>
+      <option value="breakfast">
+        มื้อเช้า
+      </option>
+
+      <option value="lunch">
+        มื้อกลางวัน
+      </option>
+
+      <option value="dinner">
+        มื้อเย็น
+      </option>
+
+      <option value="snack">
+        ของว่าง
+      </option>
     </select>
 
     <input
@@ -211,13 +301,45 @@
     >
 
     <div class="grid">
-      <input id="protein" type="number" placeholder="โปรตีน (g)">
-      <input id="carbs" type="number" placeholder="คาร์บ (g)">
-      <input id="fat" type="number" placeholder="ไขมัน (g)">
-      <input id="sugar" type="number" placeholder="น้ำตาล (g)">
-      <input id="fiber" type="number" placeholder="ใยอาหาร (g)">
-      <input id="sodium" type="number" placeholder="โซเดียม (mg)">
+
+      <input
+        id="protein"
+        type="number"
+        placeholder="โปรตีน (g)"
+      >
+
+      <input
+        id="carbs"
+        type="number"
+        placeholder="คาร์บ (g)"
+      >
+
+      <input
+        id="fat"
+        type="number"
+        placeholder="ไขมัน (g)"
+      >
+
+      <input
+        id="sugar"
+        type="number"
+        placeholder="น้ำตาล (g)"
+      >
+
+      <input
+        id="fiber"
+        type="number"
+        placeholder="ใยอาหาร (g)"
+      >
+
+      <input
+        id="sodium"
+        type="number"
+        placeholder="โซเดียม (mg)"
+      >
+
     </div>
+
 
     <button
       id="saveButton"
@@ -233,186 +355,254 @@
 
   </div>
 
+
+  <!-- Today's meals -->
+  <div class="card">
+
+    <h3>อาหารวันนี้</h3>
+
+    <div
+      id="mealList"
+      class="loading"
+    >
+      กำลังโหลด...
+    </div>
+
+  </div>
+
 </div>
+
 
 <script>
 
-  const FUNCTION_URL =
-    "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/save-meal";
+const SAVE_MEAL_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/save-meal";
 
-  let selectedFoodFile = null;
-
-  async function startLIFF() {
-
-    const welcome =
-      document.getElementById("welcome");
-
-    const status =
-      document.getElementById("status");
-
-    const profileImage =
-      document.getElementById("profileImage");
-
-    try {
-
-      await liff.init({
-        liffId: "2011496157-E8nRBs0g"
-      });
-
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
-
-      const profile =
-        await liff.getProfile();
-
-      welcome.textContent =
-        "สวัสดี " +
-        profile.displayName +
-        " 👋";
-
-      status.textContent =
-        "เชื่อมต่อบัญชี LINE แล้ว";
-
-      if (profile.pictureUrl) {
-
-        profileImage.src =
-          profile.pictureUrl;
-
-        profileImage.style.display =
-          "block";
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      status.textContent =
-        "เชื่อมต่อ LINE ไม่สำเร็จ";
-    }
-  }
+const GET_MEALS_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/dynamic-handler";
 
 
-  function openCamera() {
-
-    document
-      .getElementById("foodInput")
-      .click();
-  }
+let selectedFoodFile = null;
 
 
-  document
-    .getElementById("foodInput")
-    .addEventListener(
-      "change",
-      function(event) {
+/* ------------------------
+   LINE LOGIN
+------------------------- */
 
-        const file =
-          event.target.files[0];
+async function startLIFF() {
 
-        if (!file) return;
+  const welcome =
+    document.getElementById("welcome");
 
-        selectedFoodFile = file;
+  const status =
+    document.getElementById("status");
 
-        const preview =
-          document.getElementById(
-            "foodPreview"
-          );
+  const profileImage =
+    document.getElementById("profileImage");
 
-        preview.src =
-          URL.createObjectURL(file);
+  try {
 
-        document
-          .getElementById(
-            "previewCard"
-          )
-          .style.display =
-          "block";
-      }
-    );
+    await liff.init({
+      liffId:
+        "2011496157-E8nRBs0g"
+    });
 
 
-  function getValue(id) {
+    if (!liff.isLoggedIn()) {
 
-    return document
-      .getElementById(id)
-      .value;
-  }
-
-
-  async function saveMeal() {
-
-    const result =
-      document.getElementById(
-        "saveResult"
-      );
-
-    const button =
-      document.getElementById(
-        "saveButton"
-      );
-
-    const foodName =
-      getValue("foodName").trim();
-
-    if (!foodName) {
-
-      result.textContent =
-        "กรุณาใส่ชื่ออาหารก่อน";
+      liff.login();
 
       return;
     }
 
-    try {
 
-      button.disabled = true;
+    const profile =
+      await liff.getProfile();
 
-      button.textContent =
-        "กำลังอัปโหลดและบันทึก...";
 
-      result.textContent = "";
+    welcome.textContent =
+      "สวัสดี " +
+      profile.displayName +
+      " 👋";
 
-      const accessToken =
-        liff.getAccessToken();
 
-      if (!accessToken) {
+    status.textContent =
+      "เชื่อมต่อบัญชี LINE แล้ว";
 
-        throw new Error(
-          "ไม่พบ LINE access token"
-        );
+
+    if (profile.pictureUrl) {
+
+      profileImage.src =
+        profile.pictureUrl;
+
+      profileImage.style.display =
+        "block";
+    }
+
+
+    await loadTodayMeals();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "เชื่อมต่อ LINE ไม่สำเร็จ";
+  }
+}
+
+
+/* ------------------------
+   CAMERA
+------------------------- */
+
+function openCamera() {
+
+  document
+    .getElementById("foodInput")
+    .click();
+}
+
+
+document
+  .getElementById("foodInput")
+  .addEventListener(
+    "change",
+    function(event) {
+
+      const file =
+        event.target.files[0];
+
+
+      if (!file) {
+        return;
       }
 
 
-      const formData =
-        new FormData();
+      selectedFoodFile =
+        file;
 
-      formData.append(
-        "food_name",
-        foodName
+
+      const preview =
+        document.getElementById(
+          "foodPreview"
+        );
+
+
+      preview.src =
+        URL.createObjectURL(file);
+
+
+      document
+        .getElementById(
+          "previewCard"
+        )
+        .style.display =
+        "block";
+    }
+  );
+
+
+function getValue(id) {
+
+  return document
+    .getElementById(id)
+    .value;
+}
+
+
+/* ------------------------
+   SAVE MEAL
+------------------------- */
+
+async function saveMeal() {
+
+  const result =
+    document.getElementById(
+      "saveResult"
+    );
+
+
+  const button =
+    document.getElementById(
+      "saveButton"
+    );
+
+
+  const foodName =
+    getValue("foodName")
+      .trim();
+
+
+  if (!foodName) {
+
+    result.textContent =
+      "กรุณาใส่ชื่ออาหารก่อน";
+
+    return;
+  }
+
+
+  try {
+
+    button.disabled =
+      true;
+
+
+    button.textContent =
+      "กำลังบันทึก...";
+
+
+    result.textContent =
+      "";
+
+
+    const accessToken =
+      liff.getAccessToken();
+
+
+    if (!accessToken) {
+
+      throw new Error(
+        "ไม่พบ LINE access token"
       );
-
-      formData.append(
-        "meal_type",
-        getValue("mealType")
-      );
+    }
 
 
-      const fields = [
-        "calories",
-        "protein",
-        "carbs",
-        "fat",
-        "sugar",
-        "fiber",
-        "sodium"
-      ];
+    const formData =
+      new FormData();
 
 
-      fields.forEach((field) => {
+    formData.append(
+      "food_name",
+      foodName
+    );
+
+
+    formData.append(
+      "meal_type",
+      getValue("mealType")
+    );
+
+
+    const fields = [
+      "calories",
+      "protein",
+      "carbs",
+      "fat",
+      "sugar",
+      "fiber",
+      "sodium"
+    ];
+
+
+    fields.forEach(
+      (field) => {
 
         const value =
           getValue(field);
+
 
         if (value !== "") {
 
@@ -421,108 +611,484 @@
             value
           );
         }
-      });
-
-
-      if (selectedFoodFile) {
-
-        formData.append(
-          "image",
-          selectedFoodFile,
-          selectedFoodFile.name
-        );
       }
+    );
 
 
-      const response =
-        await fetch(
-          FUNCTION_URL,
-          {
-            method: "POST",
+    if (selectedFoodFile) {
 
-            headers: {
-              "Authorization":
-                "Bearer " +
-                accessToken
-            },
-
-            body: formData
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-
-        throw new Error(
-          data.error ||
-          "บันทึกข้อมูลไม่สำเร็จ"
-        );
-      }
-
-
-      result.textContent =
-        "✅ บันทึก " +
-        foodName +
-        " พร้อมรูปเรียบร้อยแล้ว";
-
-
-      document
-        .getElementById(
-          "foodName"
-        )
-        .value = "";
-
-
-      fields.forEach((field) => {
-
-        document
-          .getElementById(field)
-          .value = "";
-      });
-
-
-      selectedFoodFile = null;
-
-      document
-        .getElementById(
-          "foodInput"
-        )
-        .value = "";
-
-      document
-        .getElementById(
-          "previewCard"
-        )
-        .style.display =
-        "none";
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      result.textContent =
-        "❌ " +
-        error.message;
-
-    } finally {
-
-      button.disabled = false;
-
-      button.textContent =
-        "💾 บันทึกมื้อนี้";
+      formData.append(
+        "image",
+        selectedFoodFile,
+        selectedFoodFile.name
+      );
     }
+
+
+    const response =
+      await fetch(
+        SAVE_MEAL_URL,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              "Bearer " +
+              accessToken
+          },
+
+          body: formData
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.error ||
+        "บันทึกไม่สำเร็จ"
+      );
+    }
+
+
+    result.textContent =
+      "✅ บันทึก " +
+      foodName +
+      " เรียบร้อยแล้ว";
+
+
+    clearMealForm();
+
+
+    /*
+      สำคัญ:
+      บันทึกเสร็จแล้ว
+      โหลด Dashboard ใหม่ทันที
+    */
+
+    await loadTodayMeals();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    result.textContent =
+      "❌ " +
+      error.message;
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "💾 บันทึกมื้อนี้";
+  }
+}
+
+
+/* ------------------------
+   LOAD TODAY
+------------------------- */
+
+async function loadTodayMeals() {
+
+  const mealList =
+    document.getElementById(
+      "mealList"
+    );
+
+
+  try {
+
+    mealList.classList.add(
+      "loading"
+    );
+
+
+    mealList.textContent =
+      "กำลังโหลด...";
+
+
+    const accessToken =
+      liff.getAccessToken();
+
+
+    if (!accessToken) {
+
+      throw new Error(
+        "ไม่พบ LINE access token"
+      );
+    }
+
+
+    const response =
+      await fetch(
+        GET_MEALS_URL,
+        {
+          method: "GET",
+
+          headers: {
+            Authorization:
+              "Bearer " +
+              accessToken
+          }
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.error ||
+        "โหลดข้อมูลไม่สำเร็จ"
+      );
+    }
+
+
+    updateDashboard(
+      data.totals
+    );
+
+
+    renderMeals(
+      data.meals
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    mealList.textContent =
+      "โหลดรายการอาหารไม่ได้: " +
+      error.message;
+
+
+  } finally {
+
+    mealList.classList.remove(
+      "loading"
+    );
+  }
+}
+
+
+/* ------------------------
+   UPDATE TOTALS
+------------------------- */
+
+function updateDashboard(
+  totals = {}
+) {
+
+  const calories =
+    Number(
+      totals.calories || 0
+    );
+
+
+  const protein =
+    Number(
+      totals.protein || 0
+    );
+
+
+  const carbs =
+    Number(
+      totals.carbs || 0
+    );
+
+
+  const fat =
+    Number(
+      totals.fat || 0
+    );
+
+
+  document
+    .getElementById(
+      "totalCalories"
+    )
+    .textContent =
+      roundNumber(calories) +
+      " kcal";
+
+
+  document
+    .getElementById(
+      "totalProtein"
+    )
+    .textContent =
+      roundNumber(protein) +
+      "g";
+
+
+  document
+    .getElementById(
+      "totalCarbs"
+    )
+    .textContent =
+      roundNumber(carbs) +
+      "g";
+
+
+  document
+    .getElementById(
+      "totalFat"
+    )
+    .textContent =
+      roundNumber(fat) +
+      "g";
+}
+
+
+/* ------------------------
+   RENDER MEALS
+------------------------- */
+
+function renderMeals(
+  meals = []
+) {
+
+  const container =
+    document.getElementById(
+      "mealList"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  if (!meals.length) {
+
+    container.innerHTML =
+      `
+      <div class="empty">
+        วันนี้ยังไม่มีรายการอาหาร 🍽️
+      </div>
+      `;
+
+    return;
   }
 
 
-  startLIFF();
+  meals.forEach(
+    (meal) => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "meal";
+
+
+      const mealName =
+        escapeHtml(
+          meal.food_name ||
+          "ไม่ระบุชื่อ"
+        );
+
+
+      const mealType =
+        mealTypeThai(
+          meal.meal_type
+        );
+
+
+      const calories =
+        roundNumber(
+          meal.calories || 0
+        );
+
+
+      const protein =
+        roundNumber(
+          meal.protein || 0
+        );
+
+
+      const carbs =
+        roundNumber(
+          meal.carbs || 0
+        );
+
+
+      const fat =
+        roundNumber(
+          meal.fat || 0
+        );
+
+
+      div.innerHTML =
+        `
+        <div class="meal-top">
+
+          <div>
+            <div class="meal-name">
+              ${mealName}
+            </div>
+
+            <div class="meal-detail">
+              ${mealType}
+            </div>
+          </div>
+
+          <div class="meal-kcal">
+            ${calories} kcal
+          </div>
+
+        </div>
+
+        <div class="meal-detail">
+          โปรตีน ${protein}g
+          · คาร์บ ${carbs}g
+          · ไขมัน ${fat}g
+        </div>
+        `;
+
+
+      container.appendChild(
+        div
+      );
+    }
+  );
+}
+
+
+/* ------------------------
+   HELPERS
+------------------------- */
+
+function mealTypeThai(type) {
+
+  const names = {
+    breakfast:
+      "🌅 มื้อเช้า",
+
+    lunch:
+      "☀️ มื้อกลางวัน",
+
+    dinner:
+      "🌙 มื้อเย็น",
+
+    snack:
+      "🍪 ของว่าง"
+  };
+
+
+  return (
+    names[type] ||
+    "🍽️ มื้ออาหาร"
+  );
+}
+
+
+function roundNumber(value) {
+
+  const number =
+    Number(value || 0);
+
+
+  return Math.round(
+    number * 10
+  ) / 10;
+}
+
+
+function escapeHtml(value) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    value;
+
+
+  return div.innerHTML;
+}
+
+
+function clearMealForm() {
+
+  document
+    .getElementById(
+      "foodName"
+    )
+    .value =
+      "";
+
+
+  const fields = [
+    "calories",
+    "protein",
+    "carbs",
+    "fat",
+    "sugar",
+    "fiber",
+    "sodium"
+  ];
+
+
+  fields.forEach(
+    (field) => {
+
+      document
+        .getElementById(field)
+        .value =
+          "";
+    }
+  );
+
+
+  selectedFoodFile =
+    null;
+
+
+  document
+    .getElementById(
+      "foodInput"
+    )
+    .value =
+      "";
+
+
+  document
+    .getElementById(
+      "previewCard"
+    )
+    .style.display =
+      "none";
+}
+
+
+startLIFF();
 
 </script>
 
