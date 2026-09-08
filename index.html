@@ -2590,6 +2590,7 @@ function renderPatientDetail(data) {
             <img
               src="${escapeHtml(imageUrl)}"
               alt="รูปอาหาร"
+              onclick="openMealImage('${escapeHtml(imageUrl)}')"
               style="
                 width:100%;
                 max-height:320px;
@@ -3279,9 +3280,61 @@ async function searchFoodByName() {
       "❌ " + error.message;
   }
 }
+  function openMealImage(url) {
+
+  const modal =
+    document.getElementById(
+      "mealImageModal"
+    );
+
+  const img =
+    document.getElementById(
+      "mealImageModalImg"
+    );
+
+  img.src = url;
+
+  modal.style.display =
+    "flex";
+}
+
+function closeMealImage() {
+
+  const modal =
+    document.getElementById(
+      "mealImageModal"
+    );
+
+  modal.style.display =
+    "none";
+}
 startLIFF();
 
 </script>
-
+<div
+  id="mealImageModal"
+  onclick="closeMealImage()"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.9);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  "
+>
+  <img
+    id="mealImageModalImg"
+    alt="รูปอาหารขนาดใหญ่"
+    style="
+      max-width:100%;
+      max-height:90vh;
+      object-fit:contain;
+      border-radius:12px;
+    "
+  >
+</div>
 </body>
 </html>
