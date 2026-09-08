@@ -487,7 +487,25 @@
       แก้ไขข้อมูลสุขภาพ
     </button>
   </div>
+<div class="card" id="weightCard">
+  <h3>บันทึกน้ำหนักวันนี้</h3>
 
+  <input
+    id="weightInput"
+    type="number"
+    step="0.1"
+    placeholder="น้ำหนัก (กก.)"
+  >
+
+  <button onclick="saveWeight()">
+    บันทึกน้ำหนัก
+  </button>
+
+  <div
+    id="weightResult"
+    class="result"
+  ></div>
+</div>
 
   <!-- Camera -->
   <input
@@ -2713,6 +2731,89 @@ async function changeTrendPeriod(days) {
     selectedPatientId,
     days
   );
+}
+  const SAVE_WEIGHT_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/save-weight";
+
+async function saveWeight() {
+
+  const input =
+    document.getElementById(
+      "weightInput"
+    );
+
+  const result =
+    document.getElementById(
+      "weightResult"
+    );
+
+  const weight =
+    Number(input.value);
+
+  if (!weight) {
+    result.textContent =
+      "กรุณาใส่น้ำหนัก";
+    return;
+  }
+
+  try {
+
+    result.textContent =
+      "กำลังบันทึก...";
+
+    const token =
+      liff.getAccessToken();
+
+    const response =
+      await fetch(
+        SAVE_WEIGHT_URL,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+
+            Authorization:
+              "Bearer " + token
+          },
+
+          body:
+            JSON.stringify({
+              weight_kg:
+                weight
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "บันทึกน้ำหนักไม่สำเร็จ"
+      );
+    }
+
+    result.textContent =
+      "✅ บันทึกน้ำหนักเรียบร้อยแล้ว";
+
+    input.value = "";
+
+    currentProfile =
+      data.profile;
+
+    showProfileSummary();
+    updateDashboardTargets();
+
+  } catch (error) {
+
+    result.textContent =
+      "❌ " + error.message;
+  }
 }
 startLIFF();
 
