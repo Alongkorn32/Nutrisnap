@@ -2590,15 +2590,12 @@ summary.innerHTML =
   <b>${data.summary.average_calories} kcal</b>
   <br>
 
-  วันที่เกินเป้า:
-  <b>${adherence.over_target_days || 0} วัน</b>
-  <br>
+  วันที่กินเกิน:
+<b>${adherence.over_target_days || 0} วัน</b>
+<br>
 
-  วันที่ต่ำกว่าเป้า:
-  <b>${adherence.under_target_days || 0} วัน</b>
-  <br>
-
-  ${avgVsTargetText}
+วันที่กินไม่เกิน:
+<b>${adherence.under_target_days || 0} วัน</b>
   `;
 
     bars.innerHTML = "";
