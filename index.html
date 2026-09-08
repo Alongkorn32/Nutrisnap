@@ -652,8 +652,12 @@
 
   <!-- Today's meals -->
   <div class="card">
-
-    <h3>อาหารวันนี้</h3>
+<input
+  type="date"
+  id="myMealsDate"
+  onchange="loadMyMealsByDate()"
+>
+<h3 id="myMealsTitle">อาหารวันนี้</h3>
 
     <div id="mealList">
       กำลังโหลด...
@@ -738,7 +742,10 @@ document.getElementById(
 
     await loadProfile();
     await loadTodayMeals();
-
+document.getElementById(
+  "myMealsDate"
+).value =
+  todayBangkok();
   } catch (error) {
 
     console.error(error);
@@ -3352,6 +3359,96 @@ function closeMealImage() {
 
   modal.style.display =
     "none";
+}
+  async function loadMyMealsByDate() {
+
+  const dateInput =
+    document.getElementById(
+      "myMealsDate"
+    );
+
+  const selectedDate =
+    dateInput.value;
+
+  if (!selectedDate) {
+    return;
+  }
+
+  const token =
+    liff.getAccessToken();
+
+  const response =
+    await fetch(
+      GET_MEALS_URL +
+      "?date=" +
+      encodeURIComponent(
+        selectedDate
+      ),
+      {
+        headers: {
+          Authorization:
+            "Bearer " + token
+        }
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if (
+    !response.ok ||
+    !data.success
+  ) {
+    throw new Error(
+      data.error ||
+      "โหลดรายการอาหารไม่สำเร็จ"
+    );
+  }
+
+  currentTotals =
+    data.totals ||
+    {
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0
+    };
+
+  updateDashboardTotals();
+
+  renderMeals(
+    data.meals || []
+  );
+
+  const today =
+    todayBangkok();
+
+  document.getElementById(
+    "myMealsTitle"
+  ).textContent =
+    selectedDate === today
+      ? "อาหารวันนี้"
+      : "อาหารวันที่ " +
+        formatMyDate(
+          selectedDate
+        );
+}
+  function formatMyDate(value) {
+
+  const date =
+    new Date(
+      value +
+      "T00:00:00+07:00"
+    );
+
+  return date.toLocaleDateString(
+    "th-TH",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }
+  );
 }
 startLIFF();
 
