@@ -300,7 +300,31 @@
   id="patientTrendCard"
   style="display:none"
 >
-  <h3>แนวโน้ม 7 วัน</h3>
+<h3 id="trendTitle">แนวโน้ม 7 วัน</h3>
+
+<div
+  style="
+    display:flex;
+    gap:10px;
+    margin:12px 0 16px;
+  "
+>
+  <button
+    id="trend7Button"
+    class="secondary"
+    onclick="changeTrendPeriod(7)"
+  >
+    7 วัน
+  </button>
+
+  <button
+    id="trend30Button"
+    class="secondary"
+    onclick="changeTrendPeriod(30)"
+  >
+    30 วัน
+  </button>
+</div>
 
   <div id="patientTrendSummary"></div>
 
@@ -2459,7 +2483,10 @@ function closePatientDetail() {
   const GET_PATIENT_TRENDS_URL =
   "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-patient-trends";
 
-async function loadPatientTrends(patientId) {
+async function loadPatientTrends(
+  patientId,
+  days = 7
+) {
 
   const card =
     document.getElementById(
@@ -2489,9 +2516,11 @@ async function loadPatientTrends(patientId) {
 
     const response =
       await fetch(
-        GET_PATIENT_TRENDS_URL +
-        "?patient_id=" +
-        encodeURIComponent(patientId),
+GET_PATIENT_TRENDS_URL +
+"?patient_id=" +
+encodeURIComponent(patientId) +
+"&days=" +
+encodeURIComponent(days)
         {
           headers: {
             Authorization:
@@ -2512,7 +2541,13 @@ async function loadPatientTrends(patientId) {
         "โหลดแนวโน้มไม่สำเร็จ"
       );
     }
-
+document.getElementById(
+  "trendTitle"
+).textContent =
+  "แนวโน้ม " +
+  data.period_days +
+  " วัน";
+    
     card.style.display =
       "block";
 
@@ -2625,6 +2660,21 @@ function formatTrendDate(value) {
       day: "numeric",
       month: "short"
     }
+  );
+}
+  let currentTrendDays = 7;
+
+async function changeTrendPeriod(days) {
+
+  currentTrendDays = days;
+
+  if (!selectedPatientId) {
+    return;
+  }
+
+  await loadPatientTrends(
+    selectedPatientId,
+    days
   );
 }
 startLIFF();
