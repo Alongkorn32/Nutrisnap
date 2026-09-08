@@ -69,7 +69,7 @@
       flex: 1;
     }
 
-    button {
+    .camera-btn {
       width: 100%;
       border: none;
       padding: 16px;
@@ -90,6 +90,28 @@
       font-size: 14px;
       opacity: 0.7;
       margin-top: 8px;
+    }
+
+    #foodInput {
+      display: none;
+    }
+
+    #previewCard {
+      display: none;
+    }
+
+    #foodPreview {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 16px;
+      object-fit: cover;
+      max-height: 320px;
+    }
+
+    .small-note {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -132,9 +154,24 @@
       </div>
     </div>
 
-    <button onclick="alert('ขั้นต่อไปเราจะทำให้ปุ่มนี้ถ่ายรูปได้จริง')">
+    <input
+      type="file"
+      id="foodInput"
+      accept="image/*"
+      capture="environment"
+    >
+
+    <button class="camera-btn" onclick="openCamera()">
       📷 ถ่ายรูปอาหาร
     </button>
+
+    <div class="card" id="previewCard">
+      <h3>รูปอาหารที่เลือก</h3>
+      <img id="foodPreview" alt="รูปอาหาร">
+      <div class="small-note">
+        ขั้นต่อไปเราจะส่งรูปนี้ไปให้ AI วิเคราะห์อาหารและสารอาหาร
+      </div>
+    </div>
 
     <div class="card">
       <h3>อาหารวันนี้</h3>
@@ -178,14 +215,32 @@
           profileImage.style.display = "block";
         }
 
-        console.log("LINE User ID:", profile.userId);
-
       } catch (error) {
         console.error(error);
         welcome.textContent = "NutriSnap";
         status.textContent = "เชื่อมต่อ LINE ไม่สำเร็จ";
       }
     }
+
+    function openCamera() {
+      document.getElementById("foodInput").click();
+    }
+
+    document.getElementById("foodInput").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+
+      if (!file) return;
+
+      const preview = document.getElementById("foodPreview");
+      const previewCard = document.getElementById("previewCard");
+
+      preview.src = URL.createObjectURL(file);
+      previewCard.style.display = "block";
+      previewCard.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
 
     startLIFF();
   </script>
