@@ -214,7 +214,11 @@
       <div class="status" id="status"></div>
     </div>
   </div>
-<button id="registerAdminButton" onclick="registerClinician()">
+<button
+  id="registerAdminButton"
+  onclick="registerClinician()"
+  style="display:none"
+>
   ลงทะเบียนฉันเป็น Admin คนแรก
 </button>
 
@@ -222,7 +226,11 @@
 
 <div id="inviteAcceptResult" class="result"></div>
 
-<div class="card" id="inviteCard">
+<div
+  class="card"
+  id="inviteCard"
+  style="display:none"
+>
   <h3>เชิญคนไข้</h3>
 
   <p class="status">
@@ -533,6 +541,8 @@ const profile =
 
 await acceptInviteFromUrl();
 
+await loadUserRole();
+    
 document.getElementById(
   "welcome"
 ).textContent =
@@ -1722,6 +1732,97 @@ async function acceptInviteFromUrl() {
   } catch (error) {
     result.textContent =
       "❌ " + error.message;
+  }
+}
+  const GET_ROLE_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-role";
+
+let currentRole = "patient";
+
+async function loadUserRole() {
+
+  const token =
+    liff.getAccessToken();
+
+  if (!token) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        GET_ROLE_URL,
+        {
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "ตรวจสอบสิทธิ์ไม่สำเร็จ"
+      );
+    }
+
+    currentRole =
+      data.role || "patient";
+
+    const inviteCard =
+      document.getElementById(
+        "inviteCard"
+      );
+
+    const registerButton =
+      document.getElementById(
+        "registerAdminButton"
+      );
+
+    /*
+      ปุ่มสมัคร Admin คนแรก
+      ไม่ต้องแสดงอีกแล้ว
+    */
+    registerButton.style.display =
+      "none";
+
+    /*
+      admin หรือ clinician
+      เท่านั้นที่เห็นเมนูเชิญคนไข้
+    */
+    if (data.is_clinician) {
+
+      inviteCard.style.display =
+        "block";
+
+    } else {
+
+      inviteCard.style.display =
+        "none";
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Role check error:",
+      error
+    );
+
+    /*
+      ถ้าเช็กสิทธิ์ไม่ได้
+      ให้ซ่อนเมนู privileged ไว้ก่อน
+    */
+    document.getElementById(
+      "inviteCard"
+    ).style.display = "none";
   }
 }
 startLIFF();
