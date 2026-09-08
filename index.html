@@ -334,6 +334,45 @@
   ></div>
 </div>
 </div>
+<div
+  class="card"
+  id="weightTrendCard"
+  style="display:none"
+>
+  <h3 id="weightTrendTitle">
+    แนวโน้มน้ำหนัก 30 วัน
+  </h3>
+
+  <div
+    style="
+      display:flex;
+      gap:10px;
+      margin:12px 0 16px;
+    "
+  >
+    <button
+      class="secondary"
+      onclick="changeWeightTrendPeriod(30)"
+    >
+      30 วัน
+    </button>
+
+    <button
+      class="secondary"
+      onclick="changeWeightTrendPeriod(90)"
+    >
+      90 วัน
+    </button>
+  </div>
+
+  <div id="weightTrendSummary"></div>
+
+  <div
+    id="weightTrendList"
+    style="margin-top:16px;"
+  ></div>
+</div>
+  
 <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
 
   <div class="card" id="profileSetup">
@@ -2149,6 +2188,9 @@ async function openPatientDetail(
 
   await loadPatientDetail();
   await loadPatientTrends(patientId);
+  await loadPatientWeightTrends(
+  patientId
+);
 }
 
 
@@ -2813,6 +2855,199 @@ async function saveWeight() {
 
     result.textContent =
       "❌ " + error.message;
+  }
+}
+  const GET_PATIENT_WEIGHT_TRENDS_URL =
+  "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-patient-weight-trends";
+
+let currentWeightTrendDays = 30;
+
+async function changeWeightTrendPeriod(days) {
+  currentWeightTrendDays = days;
+
+  if (!selectedPatientId) {
+    return;
+  }
+
+  await loadPatientWeightTrends(
+    selectedPatientId,
+    days
+  );
+}
+
+async function loadPatientWeightTrends(
+  patientId,
+  days = 30
+) {
+  const card =
+    document.getElementById(
+      "weightTrendCard"
+    );
+
+  const summary =
+    document.getElementById(
+      "weightTrendSummary"
+    );
+
+  const list =
+    document.getElementById(
+      "weightTrendList"
+    );
+
+  try {
+    const token =
+      liff.getAccessToken();
+
+    if (!token) {
+      throw new Error(
+        "ไม่พบ LINE access token"
+      );
+    }
+
+    const response =
+      await fetch(
+        GET_PATIENT_WEIGHT_TRENDS_URL +
+        "?patient_id=" +
+        encodeURIComponent(patientId) +
+        "&days=" +
+        encodeURIComponent(days),
+        {
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.error ||
+        "โหลดแนวโน้มน้ำหนักไม่สำเร็จ"
+      );
+    }
+
+    card.style.display =
+      "block";
+
+    document.getElementById(
+      "weightTrendTitle"
+    ).textContent =
+      "แนวโน้มน้ำหนัก " +
+      data.period_days +
+      " วัน";
+
+    const s =
+      data.summary || {};
+
+    let changeText =
+      "ยังไม่มีข้อมูลเปรียบเทียบ";
+
+    if (
+      s.change_kg !== null &&
+      s.change_kg !== undefined
+    ) {
+      if (s.change_kg > 0) {
+        changeText =
+          "น้ำหนักเพิ่ม " +
+          Math.abs(s.change_kg) +
+          " กก.";
+      } else if (s.change_kg < 0) {
+        changeText =
+          "น้ำหนักลด " +
+          Math.abs(s.change_kg) +
+          " กก.";
+      } else {
+        changeText =
+          "น้ำหนักคงที่";
+      }
+    }
+
+    summary.innerHTML =
+      `
+      จำนวนครั้งที่บันทึก:
+      <b>${s.entries || 0}</b>
+      <br>
+
+      น้ำหนักล่าสุด:
+      <b>${s.latest_weight_kg ?? "-"} กก.</b>
+      <br>
+
+      ${changeText}
+      `;
+
+    list.innerHTML = "";
+
+    const logs =
+      data.logs || [];
+
+    if (!logs.length) {
+      list.innerHTML =
+        `<div class="empty">
+          ยังไม่มีประวัติน้ำหนักในช่วงนี้
+        </div>`;
+      return;
+    }
+
+    logs.forEach(log => {
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "meal";
+
+      const dateValue =
+        log.logged_at ||
+        log.created_at;
+
+      const dateText =
+        dateValue
+          ? new Date(
+              dateValue
+            ).toLocaleDateString(
+              "th-TH",
+              {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                timeZone:
+                  "Asia/Bangkok"
+              }
+            )
+          : "-";
+
+      row.innerHTML =
+        `
+        <div class="meal-top">
+          <div>
+            <div class="meal-name">
+              ${dateText}
+            </div>
+          </div>
+
+          <div class="meal-kcal">
+            ${log.weight_kg} กก.
+          </div>
+        </div>
+        `;
+
+      list.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    card.style.display =
+      "block";
+
+    summary.textContent =
+      "โหลดแนวโน้มน้ำหนักไม่ได้: " +
+      error.message;
   }
 }
 startLIFF();
