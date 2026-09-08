@@ -1536,44 +1536,89 @@ function renderMeals(meals) {
         "meal";
 
 
-      div.innerHTML =
-        `
-          <div class="meal-top">
+    const mealDate =
+  meal.eaten_at ||
+  meal.created_at;
 
-            <div>
+const mealTime =
+  mealDate
+    ? new Date(
+        mealDate
+      ).toLocaleTimeString(
+        "th-TH",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone:
+            "Asia/Bangkok"
+        }
+      )
+    : "--:--";
 
-              <div class="meal-name">
-                ${escapeHtml(
-                  meal.food_name ||
-                  "ไม่ระบุชื่อ"
-                )}
-              </div>
+const imageUrl =
+  meal.signed_image_url || "";
 
-              <div class="meal-detail">
-                ${mealTypeThai(
-                  meal.meal_type
-                )}
-              </div>
+div.innerHTML =
+  `
+  <div class="meal-top">
 
-            </div>
+    <div>
 
-            <div class="meal-kcal">
-              ${round(
-                meal.calories
-              )} kcal
-            </div>
+      <div class="meal-name">
+        ${escapeHtml(
+          meal.food_name ||
+          "ไม่ระบุชื่อ"
+        )}
+      </div>
 
-          </div>
+      <div class="meal-detail">
+        ${mealTime}
+        ·
+        ${mealTypeThai(
+          meal.meal_type
+        )}
+      </div>
 
-          <div class="meal-detail">
-            โปรตีน
-            ${round(meal.protein)}g
-            · คาร์บ
-            ${round(meal.carbs)}g
-            · ไขมัน
-            ${round(meal.fat)}g
-          </div>
-        `;
+    </div>
+
+    <div class="meal-kcal">
+      ${round(
+        meal.calories
+      )} kcal
+    </div>
+
+  </div>
+
+  <div class="meal-detail">
+    โปรตีน
+    ${round(meal.protein)}g
+    · คาร์บ
+    ${round(meal.carbs)}g
+    · ไขมัน
+    ${round(meal.fat)}g
+  </div>
+
+  ${
+    imageUrl
+      ? `
+        <img
+          src="${escapeHtml(imageUrl)}"
+          alt="รูปอาหาร"
+          onclick="openMealImage('${escapeHtml(imageUrl)}')"
+          style="
+            width:100%;
+            max-height:320px;
+            object-fit:cover;
+            border-radius:16px;
+            margin-top:12px;
+            cursor:pointer;
+          "
+        >
+      `
+      : ""
+  }
+  `;
 
 
       container.appendChild(
