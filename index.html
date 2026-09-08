@@ -214,6 +214,29 @@
       <div class="status" id="status"></div>
     </div>
   </div>
+  <div
+  style="
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  "
+>
+  <button
+    id="myViewButton"
+    class="secondary"
+    onclick="showMyView()"
+  >
+    ของฉัน
+  </button>
+
+  <button
+    id="patientsViewButton"
+    class="secondary"
+    onclick="showPatientsView()"
+  >
+    คนไข้ของฉัน
+  </button>
+</div>
 <button
   id="registerAdminButton"
   onclick="registerClinician()"
@@ -257,7 +280,7 @@
 
   <div id="inviteResult" class="result"></div>
 </div>
-
+<div id="patientsView" style="display:none">
 <div
   class="card"
   id="patientListCard"
@@ -372,9 +395,9 @@
     style="margin-top:16px;"
   ></div>
 </div>
-  
+  </div>
 <!-- ตั้งค่าโปรไฟล์ครั้งแรก -->
-
+<div id="myView">
   <div class="card" id="profileSetup">
 
     <h3>ตั้งค่าเป้าหมายของคุณ</h3>
@@ -675,7 +698,7 @@ const profile =
 await acceptInviteFromUrl();
 
 await loadUserRole();
-    
+    showMyView();
 document.getElementById(
   "welcome"
 ).textContent =
@@ -1935,15 +1958,29 @@ async function loadUserRole() {
 
   inviteCard.style.display = "block";
 
-  await loadPatients();
+  document.getElementById(
+    "patientsViewButton"
+  ).style.display = "block";
+
+  document.getElementById(
+    "myViewButton"
+  ).style.display = "block";
 
 } else {
 
   inviteCard.style.display = "none";
 
   document.getElementById(
-    "patientListCard"
+    "patientsViewButton"
   ).style.display = "none";
+
+  document.getElementById(
+    "patientsView"
+  ).style.display = "none";
+
+  document.getElementById(
+    "myView"
+  ).style.display = "block";
 }
   } catch (error) {
 
@@ -3086,6 +3123,32 @@ async function loadPatientWeightTrends(
     summary.textContent =
       "โหลดแนวโน้มน้ำหนักไม่ได้: " +
       error.message;
+  }
+}
+  function showMyView() {
+  document.getElementById(
+    "myView"
+  ).style.display = "block";
+
+  document.getElementById(
+    "patientsView"
+  ).style.display = "none";
+}
+
+function showPatientsView() {
+  document.getElementById(
+    "myView"
+  ).style.display = "none";
+
+  document.getElementById(
+    "patientsView"
+  ).style.display = "block";
+
+  if (
+    currentRole === "admin" ||
+    currentRole === "clinician"
+  ) {
+    loadPatients();
   }
 }
 startLIFF();
