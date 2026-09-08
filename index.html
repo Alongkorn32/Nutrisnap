@@ -2551,15 +2551,55 @@ document.getElementById(
     card.style.display =
       "block";
 
-    summary.innerHTML =
-      `
-     บันทึกอาหาร
-<b>${data.summary.tracked_days}</b>
-จาก ${data.period_days} วัน
-      <br>
-      แคลอรี่เฉลี่ยวันที่มีการบันทึก:
-      <b>${data.summary.average_calories} kcal</b>
-      `;
+   const adherence =
+  data.adherence || {};
+
+const avgVsTarget =
+  adherence.average_vs_target_percent;
+
+let avgVsTargetText =
+  "ยังไม่มีข้อมูลเทียบเป้า";
+
+if (avgVsTarget !== null &&
+    avgVsTarget !== undefined) {
+
+  if (avgVsTarget > 0) {
+    avgVsTargetText =
+      `เฉลี่ยสูงกว่าเป้า ${Math.abs(avgVsTarget)}%`;
+  } else if (avgVsTarget < 0) {
+    avgVsTargetText =
+      `เฉลี่ยต่ำกว่าเป้า ${Math.abs(avgVsTarget)}%`;
+  } else {
+    avgVsTargetText =
+      "เฉลี่ยตรงกับเป้าพอดี";
+  }
+}
+
+summary.innerHTML =
+  `
+  บันทึกอาหาร
+  <b>${data.summary.tracked_days}</b>
+  จาก ${data.period_days} วัน
+  <br>
+
+  อัตราการบันทึก:
+  <b>${adherence.logging_rate || 0}%</b>
+  <br>
+
+  แคลอรี่เฉลี่ยวันที่มีการบันทึก:
+  <b>${data.summary.average_calories} kcal</b>
+  <br>
+
+  วันที่เกินเป้า:
+  <b>${adherence.over_target_days || 0} วัน</b>
+  <br>
+
+  วันที่ต่ำกว่าเป้า:
+  <b>${adherence.under_target_days || 0} วัน</b>
+  <br>
+
+  ${avgVsTargetText}
+  `;
 
     bars.innerHTML = "";
 
