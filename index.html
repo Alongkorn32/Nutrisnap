@@ -539,7 +539,15 @@
         id="calorieProgress"
       ></div>
     </div>
-
+<div
+  id="dashboardDietPattern"
+  style="
+    margin-bottom:16px;
+    font-weight:600;
+  "
+>
+  รูปแบบอาหารที่เลือก: ทั่วไป
+</div>
     <div class="macros">
 
       <div class="macro">
@@ -1483,7 +1491,21 @@ function updateDashboardTargets() {
 
     return;
   }
+let dashboardDietPatternLabel = "ทั่วไป";
 
+if (currentProfile.diet_pattern === "low_carb") {
+  dashboardDietPatternLabel = "Low Carb";
+}
+
+if (currentProfile.diet_pattern === "keto") {
+  dashboardDietPatternLabel = "Keto";
+}
+
+document.getElementById(
+  "dashboardDietPattern"
+).textContent =
+  "รูปแบบอาหารที่เลือก: " +
+  dashboardDietPatternLabel;
 
   const target =
     Number(
@@ -1542,28 +1564,58 @@ function updateDashboardTargets() {
     percent + "%";
 
 
-  document.getElementById(
-    "proteinTargetText"
-  ).textContent =
-    "จาก " +
-    currentProfile.protein_target +
-    "g";
+const proteinRemaining =
+  currentProfile.protein_target -
+  currentTotals.protein;
+
+document.getElementById(
+  "proteinTargetText"
+).textContent =
+  proteinRemaining > 0
+    ? "ยังขาด " +
+      round(proteinRemaining) +
+      "g"
+    : proteinRemaining < 0
+      ? "เกินเป้า " +
+        round(Math.abs(proteinRemaining)) +
+        "g"
+      : "ครบเป้าพอดี";
 
 
-  document.getElementById(
-    "carbsTargetText"
-  ).textContent =
-    "จาก " +
-    currentProfile.carbs_target +
-    "g";
+const carbsRemaining =
+  currentProfile.carbs_target -
+  currentTotals.carbs;
+
+document.getElementById(
+  "carbsTargetText"
+).textContent =
+  carbsRemaining > 0
+    ? "ยังขาด " +
+      round(carbsRemaining) +
+      "g"
+    : carbsRemaining < 0
+      ? "เกินเป้า " +
+        round(Math.abs(carbsRemaining)) +
+        "g"
+      : "ครบเป้าพอดี";
 
 
-  document.getElementById(
-    "fatTargetText"
-  ).textContent =
-    "จาก " +
-    currentProfile.fat_target +
-    "g";
+const fatRemaining =
+  currentProfile.fat_target -
+  currentTotals.fat;
+
+document.getElementById(
+  "fatTargetText"
+).textContent =
+  fatRemaining > 0
+    ? "ยังขาด " +
+      round(fatRemaining) +
+      "g"
+    : fatRemaining < 0
+      ? "เกินเป้า " +
+        round(Math.abs(fatRemaining)) +
+        "g"
+      : "ครบเป้าพอดี";
 }
 
 
