@@ -610,6 +610,21 @@
       แก้ไขข้อมูลสุขภาพ
     </button>
   </div>
+  <div
+  class="card"
+  id="caregiverMessageCard"
+  style="display:none"
+>
+  <h3>ข้อความจากผู้ดูแล</h3>
+
+  <div
+    id="caregiverMessageText"
+    style="
+      line-height:1.7;
+      white-space:pre-wrap;
+    "
+  ></div>
+</div>
 <div class="card" id="weightCard">
   <h3>บันทึกน้ำหนักวันนี้</h3>
 
@@ -3611,8 +3626,66 @@ if (
 ) {
   inviteCard.style.display = "block";
 }
+    loadMyMessage();
 }
+async function loadMyMessage() {
+  const card =
+    document.getElementById(
+      "caregiverMessageCard"
+    );
 
+  const text =
+    document.getElementById(
+      "caregiverMessageText"
+    );
+
+  if (!card || !text) {
+    return;
+  }
+
+  try {
+    const accessToken =
+      liff.getAccessToken();
+
+    if (!accessToken) {
+      card.style.display = "none";
+      return;
+    }
+
+    const response =
+      await fetch(
+        "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/get-my-message",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success ||
+      !data.message
+    ) {
+      card.style.display = "none";
+      return;
+    }
+
+    text.textContent =
+      data.message;
+
+    card.style.display =
+      "block";
+
+  } catch (error) {
+    console.error(error);
+    card.style.display = "none";
+  }
+}
 function showPatientsView() {
   document.getElementById(
     "myView"
