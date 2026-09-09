@@ -596,7 +596,7 @@
     id="profileSummaryCard"
     style="display:none"
   >
-    <h3>เป้าหมายของฉัน</h3>
+<h3>ข้อมูลสุขภาพของฉัน</h3>
 
     <div
       class="profile-summary"
@@ -1065,7 +1065,23 @@ if (currentProfile.diet_pattern === "keto") {
       อายุ:
   <b>${currentProfile.age ?? "-"} ปี</b>
   <br>
+เพศ:
+<b>${
+  currentProfile.sex === "male"
+    ? "ชาย"
+    : currentProfile.sex === "female"
+      ? "หญิง"
+      : currentProfile.sex || "-"
+}</b>
+<br>
 
+ส่วนสูง:
+<b>${currentProfile.height_cm ?? "-"} ซม.</b>
+<br>
+
+น้ำหนัก:
+<b>${currentProfile.weight_kg ?? "-"} กก.</b>
+<br>
   BMI:
   <b>${currentProfile.bmi ?? "-"}</b>
   ${
