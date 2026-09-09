@@ -254,7 +254,18 @@
   id="inviteCard"
   style="display:none"
 >
-  <h3>เชิญคนไข้</h3>
+<button
+  class="secondary"
+  onclick="toggleInviteCard()"
+  style="margin-bottom:0;"
+>
+  🔗 เชิญคนไข้ ▾
+</button>
+
+<div
+  id="inviteCardContent"
+  style="display:none; margin-top:16px;"
+>
 
   <p class="status">
     สร้างลิงก์ส่วนตัวของคุณ แล้วส่งให้คนไข้กดจาก LINE
@@ -279,6 +290,8 @@
   </button>
 
   <div id="inviteResult" class="result"></div>
+  
+</div>
 </div>
 <div id="patientsView" style="display:none">
 <div
@@ -1923,6 +1936,19 @@ async function registerClinician() {
   const CREATE_INVITE_URL =
   "https://cvzmuehsizldprlroysk.supabase.co/functions/v1/create-invite";
 
+  function toggleInviteCard() {
+  const content =
+    document.getElementById("inviteCardContent");
+
+  if (!content) {
+    return;
+  }
+
+  content.style.display =
+    content.style.display === "none"
+      ? "block"
+      : "none";
+}
 async function createInviteLink() {
 
   const result =
@@ -2460,7 +2486,12 @@ async function openPatientDetail(
 
   card.style.display =
     "block";
+const inviteCard =
+  document.getElementById("inviteCard");
 
+if (inviteCard) {
+  inviteCard.style.display = "none";
+}
   card.scrollIntoView({
     behavior: "smooth",
     block: "start"
@@ -2825,7 +2856,25 @@ function closePatientDetail() {
     "patientDetailCard"
   ).style.display =
     "none";
+const inviteCard =
+  document.getElementById("inviteCard");
 
+if (
+  inviteCard &&
+  (
+    currentRole === "admin" ||
+    currentRole === "clinician"
+  )
+) {
+  inviteCard.style.display = "block";
+}
+
+const inviteContent =
+  document.getElementById("inviteCardContent");
+
+if (inviteContent) {
+  inviteContent.style.display = "none";
+}
   document.getElementById(
     "patientListCard"
   ).scrollIntoView({
