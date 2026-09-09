@@ -2645,7 +2645,19 @@ function renderPatientDetail(data) {
     profile?.picture_url ||
     "";
 
+const sexLabel =
+  profile?.sex === "male"
+    ? "ชาย"
+    : profile?.sex === "female"
+      ? "หญิง"
+      : profile?.sex || "-";
 
+const dietPatternLabel =
+  profile?.diet_pattern === "low_carb"
+    ? "Low Carb"
+    : profile?.diet_pattern === "keto"
+      ? "Keto"
+      : "ทั่วไป";
   header.innerHTML =
     `
     <div
@@ -2681,21 +2693,66 @@ function renderPatientDetail(data) {
         ${
           profile
             ? `
-<div class="status">
-  อายุ ${profile.age ?? "-"} ปี
+<div
+  style="
+    margin-top:12px;
+    line-height:1.8;
+  "
+>
+  <b>ข้อมูลสุขภาพของคนไข้</b>
   <br>
 
-  BMI ${profile.bmi ?? "-"}
+  อายุ: <b>${profile.age ?? "-"} ปี</b>
+  <br>
+
+  เพศ: <b>${sexLabel}</b>
+  <br>
+
+  ส่วนสูง: <b>${profile.height_cm ?? "-"} ซม.</b>
+  <br>
+
+  น้ำหนัก: <b>${profile.weight_kg ?? "-"} กก.</b>
+  <br>
+
+  BMI:
+  <b>${profile.bmi ?? "-"}</b>
   ${
     profile.bmi_category
       ? " · " + profile.bmi_category
       : ""
   }
+
+  <br><br>
+
+  พลังงานพื้นฐานของร่างกาย (BMR)
+  <br>
+  <b>${profile.bmr ?? "-"} kcal/วัน</b>
+
+  <br><br>
+
+  พลังงานที่ใช้ต่อวันโดยประมาณ (TDEE)
+  <br>
+  <b>${profile.tdee ?? "-"} kcal/วัน</b>
+
+  <br><br>
+
+  เป้ากินต่อวันตามเป้าหมาย
+  <br>
+  <b>${profile.calorie_target ?? "-"} kcal/วัน</b>
+
+  <br><br>
+
+  รูปแบบอาหาร:
+  <b>${dietPatternLabel}</b>
+
   <br>
 
-  น้ำหนัก ${profile.weight_kg || "-"} กก.
-  · TDEE ${profile.tdee || "-"} kcal
-  · เป้า ${profile.calorie_target || "-"} kcal
+  โปรตีน:
+  <b>${profile.protein_target ?? "-"} g</b>
+  · คาร์บ:
+  <b>${profile.carbs_target ?? "-"} g</b>
+  · ไขมัน:
+  <b>${profile.fat_target ?? "-"} g</b>
 </div>
             `
             : `
