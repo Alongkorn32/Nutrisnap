@@ -223,7 +223,7 @@
 >
   <button
     id="myViewButton"
-    class="secondary"
+
     onclick="showMyView()"
   >
     ของฉัน
@@ -3399,6 +3399,13 @@ async function loadPatientWeightTrends(
   document.getElementById(
     "patientsView"
   ).style.display = "none";
+    document.getElementById(
+  "myViewButton"
+).className = "";
+
+document.getElementById(
+  "patientsViewButton"
+).className = "secondary";
     const inviteCard =
   document.getElementById("inviteCard");
 
@@ -3421,6 +3428,13 @@ function showPatientsView() {
   document.getElementById(
     "patientsView"
   ).style.display = "block";
+  document.getElementById(
+  "myViewButton"
+).className = "secondary";
+
+document.getElementById(
+  "patientsViewButton"
+).className = "";
 const inviteCard =
   document.getElementById("inviteCard");
 
