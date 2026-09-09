@@ -407,7 +407,18 @@
       และเป้าพลังงานต่อวัน
     </div>
 
-   <input
+ <label
+  for="dateOfBirth"
+  style="
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+  "
+>
+  วันเดือนปีเกิด
+</label>
+
+<input
   id="dateOfBirth"
   type="date"
 >
@@ -870,7 +881,7 @@ async function saveProfile() {
 
 
   if (
-    !payload.age ||
+    !payload.date_of_birth ||
     !payload.sex ||
     !payload.height_cm ||
     !payload.weight_kg ||
