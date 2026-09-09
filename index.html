@@ -407,11 +407,10 @@
       และเป้าพลังงานต่อวัน
     </div>
 
-    <input
-      id="age"
-      type="number"
-      placeholder="อายุ (ปี)"
-    >
+   <input
+  id="dateOfBirth"
+  type="date"
+>
 
     <select id="sex">
       <option value="">เลือกเพศสำหรับสูตร BMR</option>
@@ -834,12 +833,10 @@ async function saveProfile() {
     );
 
   const payload = {
-    age:
-      Number(
-        document.getElementById(
-          "age"
-        ).value
-      ),
+     date_of_birth:
+    document.getElementById(
+      "dateOfBirth"
+    ).value,
 
     sex:
       document.getElementById(
@@ -993,6 +990,18 @@ function showProfileSummary() {
     "profileSummary"
   ).innerHTML =
     `
+      อายุ:
+  <b>${currentProfile.age ?? "-"} ปี</b>
+  <br>
+
+  BMI:
+  <b>${currentProfile.bmi ?? "-"}</b>
+  ${
+    currentProfile.bmi_category
+      ? " · " + currentProfile.bmi_category
+      : ""
+  }
+  <br><br>
       BMR:
       <b>${currentProfile.bmr} kcal</b>
       <br>
@@ -1022,10 +1031,10 @@ function editProfile() {
   }
 
 
-  document.getElementById(
-    "age"
-  ).value =
-    currentProfile.age;
+document.getElementById(
+  "dateOfBirth"
+).value =
+  currentProfile.date_of_birth || "";
 
 
   document.getElementById(
@@ -2493,11 +2502,22 @@ function renderPatientDetail(data) {
         ${
           profile
             ? `
-              <div class="status">
-                ${profile.weight_kg || "-"} kg
-                · TDEE ${profile.tdee || "-"} kcal
-                · เป้า ${profile.calorie_target || "-"} kcal
-              </div>
+<div class="status">
+  อายุ ${profile.age ?? "-"} ปี
+  <br>
+
+  BMI ${profile.bmi ?? "-"}
+  ${
+    profile.bmi_category
+      ? " · " + profile.bmi_category
+      : ""
+  }
+  <br>
+
+  น้ำหนัก ${profile.weight_kg || "-"} กก.
+  · TDEE ${profile.tdee || "-"} kcal
+  · เป้า ${profile.calorie_target || "-"} kcal
+</div>
             `
             : `
               <div class="status">
