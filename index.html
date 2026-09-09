@@ -3694,6 +3694,14 @@ function showPatientsView() {
   document.getElementById(
     "patientsView"
   ).style.display = "block";
+  const patientTrendCard =
+  document.getElementById(
+    "patientTrendCard"
+  );
+
+if (patientTrendCard) {
+  patientTrendCard.style.display = "none";
+}
   document.getElementById(
   "myViewButton"
 ).className = "secondary";
