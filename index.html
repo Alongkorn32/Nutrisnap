@@ -3399,6 +3399,18 @@ async function loadPatientWeightTrends(
   document.getElementById(
     "patientsView"
   ).style.display = "none";
+    const inviteCard =
+  document.getElementById("inviteCard");
+
+if (
+  inviteCard &&
+  (
+    currentRole === "admin" ||
+    currentRole === "clinician"
+  )
+) {
+  inviteCard.style.display = "block";
+}
 }
 
 function showPatientsView() {
@@ -3409,7 +3421,12 @@ function showPatientsView() {
   document.getElementById(
     "patientsView"
   ).style.display = "block";
+const inviteCard =
+  document.getElementById("inviteCard");
 
+if (inviteCard) {
+  inviteCard.style.display = "none";
+}
   if (
     currentRole === "admin" ||
     currentRole === "clinician"
