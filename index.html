@@ -515,7 +515,7 @@
   <!-- Dashboard -->
   <div class="card">
 
-    <div>พลังงานวันนี้</div>
+<div>พลังงานที่รับประทานวันนี้</div>
 
     <div
       class="calories"
@@ -524,9 +524,9 @@
       0 kcal
     </div>
 
-    <div id="calorieTargetText">
-      เป้าหมายรายวัน: ยังไม่ได้ตั้ง
-    </div>
+<div id="calorieTargetText">
+  เป้าหมายพลังงานวันนี้: ยังไม่ได้ตั้ง
+</div>
 
     <div
       class="remaining"
@@ -543,18 +543,21 @@
     <div class="macros">
 
       <div class="macro">
+        <div><b>โปรตีน</b></div>
         <b id="totalProtein">0g</b>
         <br>
         <span id="proteinTargetText">โปรตีน</span>
       </div>
 
       <div class="macro">
+        <div><b>คาร์โบไฮเดรต</b></div>
         <b id="totalCarbs">0g</b>
         <br>
         <span id="carbsTargetText">คาร์บ</span>
       </div>
 
       <div class="macro">
+        <div><b>ไขมัน</b></div>
         <b id="totalFat">0g</b>
         <br>
         <span id="fatTargetText">ไขมัน</span>
@@ -1512,9 +1515,9 @@ function updateDashboardTargets() {
     "remainingCalories"
   ).textContent =
     remaining >= 0
-    ? "เหลืออีก " +
-      round(remaining) +
-      " kcal วันนี้"
+? "ยังรับประทานได้อีกประมาณ " +
+  round(remaining) +
+  " kcal วันนี้"
     : "เกินเป้าประมาณ " +
       round(
         Math.abs(
