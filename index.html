@@ -1017,7 +1017,15 @@ function showProfileSummary() {
   if (!currentProfile) {
     return;
   }
+let dietPatternLabel = "ทั่วไป";
 
+if (currentProfile.diet_pattern === "low_carb") {
+  dietPatternLabel = "Low Carb";
+}
+
+if (currentProfile.diet_pattern === "keto") {
+  dietPatternLabel = "Keto";
+}
 
   document.getElementById(
     "profileSummaryCard"
@@ -1055,7 +1063,9 @@ function showProfileSummary() {
 <br>
 <b>${currentProfile.calorie_target} kcal/วัน</b>
       <br><br>
-
+รูปแบบอาหาร:
+<b>${dietPatternLabel}</b>
+<br><br>
       โปรตีน:
       <b>${currentProfile.protein_target} g</b>
       · คาร์บ:
