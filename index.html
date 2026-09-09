@@ -1569,9 +1569,12 @@ const proteinRemaining =
   currentProfile.protein_target -
   currentTotals.protein;
 
-document.getElementById(
-  "proteinTargetText"
-).textContent =
+const proteinTargetText =
+  document.getElementById(
+    "proteinTargetText"
+  );
+
+proteinTargetText.textContent =
   proteinRemaining > 0
     ? "ยังขาด " +
       round(proteinRemaining) +
@@ -1582,14 +1585,22 @@ document.getElementById(
         "g"
       : "ครบเป้าพอดี";
 
+proteinTargetText.style.color =
+  proteinRemaining < 0
+    ? "#c62828"
+    : "#174d37";
+
 
 const carbsRemaining =
   currentProfile.carbs_target -
   currentTotals.carbs;
 
-document.getElementById(
-  "carbsTargetText"
-).textContent =
+const carbsTargetText =
+  document.getElementById(
+    "carbsTargetText"
+  );
+
+carbsTargetText.textContent =
   carbsRemaining > 0
     ? "ยังขาด " +
       round(carbsRemaining) +
@@ -1600,14 +1611,22 @@ document.getElementById(
         "g"
       : "ครบเป้าพอดี";
 
+carbsTargetText.style.color =
+  carbsRemaining < 0
+    ? "#c62828"
+    : "#174d37";
+
 
 const fatRemaining =
   currentProfile.fat_target -
   currentTotals.fat;
 
-document.getElementById(
-  "fatTargetText"
-).textContent =
+const fatTargetText =
+  document.getElementById(
+    "fatTargetText"
+  );
+
+fatTargetText.textContent =
   fatRemaining > 0
     ? "ยังขาด " +
       round(fatRemaining) +
@@ -1617,6 +1636,11 @@ document.getElementById(
         round(Math.abs(fatRemaining)) +
         "g"
       : "ครบเป้าพอดี";
+
+fatTargetText.style.color =
+  fatRemaining < 0
+    ? "#c62828"
+    : "#174d37";
 }
 
 
