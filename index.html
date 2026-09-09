@@ -476,7 +476,31 @@
       <option value="maintain">รักษาน้ำหนัก</option>
       <option value="gain">เพิ่มน้ำหนัก / เพิ่มกล้าม</option>
     </select>
+<label
+  for="dietPattern"
+  style="
+    display:block;
+    margin-top:16px;
+    margin-bottom:8px;
+    font-weight:600;
+  "
+>
+  รูปแบบอาหาร
+</label>
 
+<select id="dietPattern">
+  <option value="general">
+    ทั่วไป
+  </option>
+
+  <option value="low_carb">
+    Low Carb
+  </option>
+
+  <option value="keto">
+    Keto
+  </option>
+</select>
     <button id="saveProfileButton" onclick="saveProfile()">
       คำนวณเป้าหมายของฉัน
     </button>
